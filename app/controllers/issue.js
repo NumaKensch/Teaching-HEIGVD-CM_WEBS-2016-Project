@@ -7,6 +7,20 @@ module.exports = function (app) {
 	app.use('/api/v1/issues', router);
 };
 
+function findIssue(req, res, next){
+	Issue.findById(issueId, function(err, issue){
+		if(err){
+			res.status(500).send(err);
+			return;
+		} else if (!issue){
+			res.status(404).send('Issue not found');
+			return;
+		}
+		req.issue = issue;
+		next();
+	});
+}
+
 //Post /api/issues
 router.post('/', function (req, res, next){
 	var issue = new Issue(req.body);
@@ -73,7 +87,6 @@ router.post('/:id/action', function(req, res, next) {
 	var issueId = req.params.id;
 	
 	var action = req.body;
-	console.log(action);
 	
 	Issue.findById(issueId, function(err, issue) {
 		if(err){
@@ -99,8 +112,8 @@ router.post('/:id/action', function(req, res, next) {
 				}
 
 				res.send(action);
-			})
-		}
+			});
+		});
 		/*
 		issue.action.push(action);
 		issue.save(function(err) {
@@ -111,5 +124,20 @@ router.post('/:id/action', function(req, res, next) {
 
 			res.send(action);
 		});*/
+	});
+});
+
+//Ajouter un commentaire à un problème /api/v1/issues/:id/action
+router.post('/:id/comment', findIssue,function(req, res, next) {
+	var issueId = req.params.id;
+	
+	var comment = new Comment(req.body);
+	comment.save(function(err, createdComment){
+		if (err) {
+			res.status(500).send(err);
+			return;
+		}
+
+		res.send(createdComment);
 	});
 });

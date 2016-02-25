@@ -5,8 +5,8 @@ var IssueSchema = new Schema({
 	author: { type: Schema.Types.ObjectId, ref: 'User', required:true },
 	description: { type:String, required:true },
 	coordinate: {
-		{ type:Number, required:true }, 
-		{ type:Number, required:true }
+		type: { type:String, required:true }, 
+		coordinates: [{ type:Number, required:true }]
 	},
 	status: { type:String, required:true },
 	action: [

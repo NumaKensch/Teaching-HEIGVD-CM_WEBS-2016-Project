@@ -40,8 +40,7 @@ router.get('/:idUser', function(req, res, next){
 	var idUser
 	 = req.params.id;
 
-	User.findById(idUser
-		, function(err, user){
+	User.findById(idUser, function(err, user){
 		if(err){
 			res.status(500).send(err);
 			return;

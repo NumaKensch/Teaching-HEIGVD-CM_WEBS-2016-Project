@@ -1,7 +1,7 @@
 var express = require('express'),
 router = express.Router(),
 mongoose = require('mongoose'),
-User =mongoose.model('issuesTypes');
+User =mongoose.model('IssueType');
 
 module.exports = function (app) {
 	app.use('/api/v1/issuesTypes', router);
@@ -40,8 +40,7 @@ router.get('/:idUser', function(req, res, next){
 	var idUser
 	 = req.params.id;
 
-	IssueType.findById(idUser
-		, function(err, user){
+	IssueType.findById(idUser, function(err, user){
 		if(err){
 			res.status(500).send(err);
 			return;
@@ -79,7 +78,7 @@ router.delete('/:idUser', function(req, res, next){
 
 //GET /api/v1/users/:id
 //get the list of all users with the pagination
-	router.get('/api/v1/users?page=:integer&per_page=:integer', function(req, res, next){
+	router.get('/api/v1/users', function(req, res, next){
 		User.find(function (err,user){
 			if (err){
 				res.status(500).send(err);
@@ -93,7 +92,7 @@ router.delete('/:idUser', function(req, res, next){
 //POST /api/v1/users 
 //Add the role staff to a citizen
 
-router.post('/api/v1/users?:idUser?role=:idRole', function (req, res, next){
+router.post('/api/v1/users', function (req, res, next){
 	var user = new User(req.body);
 
 	user.save(function(err, addRole){
@@ -108,7 +107,7 @@ router.post('/api/v1/users?:idUser?role=:idRole', function (req, res, next){
 
 //DELETE /api/v1/users/:idUser
 //Delete the role staff to a citizen
-router.delete('/api/v1/users?:idUser?role=:idRole', function(req, res, next){
+router.delete('/api/v1/users', function(req, res, next){
 
 	var idRole
 	 = req.params.idRole;
