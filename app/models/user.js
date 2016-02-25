@@ -6,9 +6,7 @@ var UserSchema = new Schema({
 		first: {type:String, require:true},
 		last: {type:String, require:true}
 	},
-	role: [{
-		nameRole: {type:String, require:true}
-	}]
+	role: [String]
 });
 
 mongoose.model('User', UserSchema);

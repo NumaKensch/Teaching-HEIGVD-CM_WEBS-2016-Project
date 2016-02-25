@@ -1,31 +1,31 @@
 var express = require('express'),
 router = express.Router(),
 mongoose = require('mongoose'),
-User =mongoose.model('User');
+User =mongoose.model('issuesTypes');
 
 module.exports = function (app) {
-	app.use('/api/v1/users', router);
+	app.use('/api/v1/issuesTypes', router);
 };
 
-//POST /api/v1/users 
-//Add a user and his role
+//POST /api/v1/issuesTypes
+//Add a type of issu
 router.post('/', function (req, res, next){
-	var user = new User(req.body);
+	var issueType = new IssueType(req.body);
 
-	user.save(function(err, createdUser){
+	issueType.save(function(err, createdIssueType){
 		if (err) {
 			res.status(500).send(err);
 			return;
 		}
 
-		res.send(createdUser);
+		res.send(createdIssueType);
 	});
 });
 
 //Get /api/v1/users
 //get the list of all users
 router.get('/', function(req, res, next){
-	User.find(function (err,user){
+	IssueType.find(function (err,user){
 		if (err){
 			res.status(500).send(err);
 			return;
@@ -40,7 +40,7 @@ router.get('/:idUser', function(req, res, next){
 	var idUser
 	 = req.params.id;
 
-	User.findById(idUser
+	IssueType.findById(idUser
 		, function(err, user){
 		if(err){
 			res.status(500).send(err);
@@ -79,7 +79,7 @@ router.delete('/:idUser', function(req, res, next){
 
 //GET /api/v1/users/:id
 //get the list of all users with the pagination
-	router.get('/api/v1/users?page={integer}&per_page={integer}', function(req, res, next){
+	router.get('/api/v1/users?page=:integer&per_page=:integer', function(req, res, next){
 		User.find(function (err,user){
 			if (err){
 				res.status(500).send(err);
