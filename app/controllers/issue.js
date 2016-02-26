@@ -1,4 +1,5 @@
-var express = require('express'),
+var async = require('async'),
+express = require('express'),
 router = express.Router(),
 mongoose = require('mongoose'),
 Issue =mongoose.model('Issue');
@@ -56,13 +57,105 @@ router.post('/', function (req, res, next){
 
 //Get /api/issues
 router.get('/', function(req, res, next){
-	Issue.find(function (err,issue){
-		if (err){
-			res.status(500).send(err);
-			return;
-		}
-	res.send(issue);
-	});
+	var criteria = {};
+
+	if (req.query.issuesType) {
+		criteria["issueType.type"] = req.query.issuesType;
+	}
+
+	if (req.query.region) {
+		criteria.region = req.query.region;
+	}
+
+	if (req.query.startDate) {
+		criteria.date = { $gte: req.query.startDate, $lte: req.query.endDate};
+	}
+
+	if (req.query.status) {
+		criteria.status = req.query.status;
+	}
+
+ console.log(criteria);
+	// Get page and page size for pagination.
+	var page = req.query.page ? parseInt(req.query.page, 10) : 1,
+	pageSize = req.query.pageSize ? parseInt(req.query.pageSize, 10) : 30;
+
+	// Convert page and page size to offset and limit.
+	var offset = (page - 1) * pageSize,
+	limit = pageSize;
+
+	// Count all books (without filters).
+	function countAllIssues(callback) {
+		Issue.count(function(err, totalCount) {
+	  		if (err) {
+	    		callback(err);
+	  		} else {
+	    		callback(undefined, totalCount);
+	  		}
+		});
+	}
+
+  	// Count books matching the filters.
+  	function countFilteredIssues(callback) {
+    	Issue.count(criteria, function(err, filteredCount) {
+      	if (err) {
+        		callback(err);
+      		} else {
+        		callback(undefined, filteredCount);
+      		}
+    	});
+  	}
+
+  	// Find books matching the filters.
+  	function findMatchingIssues(callback) {
+
+    	var query = Issue
+      	.find(criteria)
+      	// Do not forget to sort, as pagination makes more sense with sorting.
+      	.sort('date')
+      	.skip(offset)
+      	.limit(limit);
+
+    	// Embed publisher object if specified in the query.
+    	if (req.query.embed == 'publisher') {
+      		query = query.populate('publisher');
+    	}
+
+    	// Execute the query.
+    	query.exec(function(err, issues) {
+      		if (err) {
+        		callback(err);
+      		} else {
+        		callback(undefined, issues);
+      		}
+    	});
+  	}
+
+  	// Set the pagination headers and send the matching books in the body.
+  	function sendResponse(err, results) {
+    	if (err) {
+      		res.status(500).send(err);
+      		return;
+    	}
+
+    	var totalCount = results[0],
+        filteredCount = results[1],
+        issues = results[2];
+
+    	// Return the pagination data in headers.
+    	res.set('X-Pagination-Page', page);
+    	res.set('X-Pagination-Page-Size', pageSize);
+    	res.set('X-Pagination-Total', totalCount);
+    	res.set('X-Pagination-Filtered-Total', filteredCount);
+
+    	res.send(issues);
+  	}
+
+	async.parallel([
+    countAllIssues,
+    countFilteredIssues,
+    findMatchingIssues
+  	], sendResponse);
 });
 
 //Get /api/issues selon ID

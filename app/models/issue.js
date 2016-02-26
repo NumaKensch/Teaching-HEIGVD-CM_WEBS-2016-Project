@@ -17,10 +17,11 @@ var IssueSchema = new Schema({
 	action: [
 		{
 			staffId: { type: Schema.Types.ObjectId, ref: 'User', required:true },
-			date: { type:Date, required:true},
+			date: { type:Date, required:true },
 			description: { type:String, required:true}
 		}
 	],
+	date: { type:Date, required:true },
 	keyWords: [
 		{
 			word: { type:String, required:false}
