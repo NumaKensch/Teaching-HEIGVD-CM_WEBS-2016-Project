@@ -22,6 +22,12 @@ module.exports = function (grunt) {
     },
     all: [ "Gruntfile.js", "app/**/*.js", "public/js/**/*.js", "app.js" ]
   },
+  apidoc: {
+  myapp: {
+    src: "app/",
+    dest: "public/apidoc/"
+  }
+},
   stylus: {
     dist: {
       files: {

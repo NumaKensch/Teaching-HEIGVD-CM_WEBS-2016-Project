@@ -2,13 +2,55 @@ var express = require('express'),
 router = express.Router(),
 mongoose = require('mongoose'),
 User =mongoose.model('User');
+Issue =mongoose.model('Issue');
 
 module.exports = function (app) {
 	app.use('/api/v1/users', router);
 };
 
+function findUser(req, res, next){
+	console.log(req.params.idUser);
+	User.findById(req.params.idUser, function(err, user){
+		if(err){
+			res.status(500).send(err);
+			return;
+		} else if (!user){
+			res.status(404).send('User not found');
+			return;
+		}
+		req.user = user;
+		next();
+	});
+}
+
 //POST /api/v1/users 
 //Add a user and his role
+
+/**
+ * @api {post} /users Add a user
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiSuccess {String} firstname Firstname of the User.
+ * @apiSuccess {String} lastname  Lastname of the User.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "firstname": "John",
+ *       "lastname": "Doe"
+ *     }
+ *
+ * @apiError UserNotFound The id of the User was not found.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "UserNotFound"
+ *     }
+ */
 router.post('/', function (req, res, next){
 	var user = new User(req.body);
 
@@ -22,8 +64,36 @@ router.post('/', function (req, res, next){
 	});
 });
 
+
+
 //Get /api/v1/users
 //get the list of all users
+
+/**
+ * @api {get} /user/:id Request User information
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiSuccess {String} firstname Firstname of the User.
+ * @apiSuccess {String} lastname  Lastname of the User.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "firstname": "John",
+ *       "lastname": "Doe"
+ *     }
+ *
+ * @apiError UserNotFound The id of the User was not found.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "UserNotFound"
+ *     }
+ */
 router.get('/', function(req, res, next){
 	User.find(function (err,user){
 		if (err){
@@ -124,60 +194,40 @@ router.post('/:idUser/role', function (req, res, next){
 });
 
 
-//DELETE /api/v1/users/:idUser
+//DELETE /api/v1/users/:idUser/role
 //Delete the role staff to a use
 
-// router.delete('/api/v1/users', function(req, res, next){
+router.delete('/:idUser/role/:role',findUser,function(req, res, next){
+	var userId = req.params.idUser;
 
-// 	var idRole
-// 	 = req.params.idRole;
+	var role = req.params.role;
 
-// 	User.role.remove({
-// 		_id: idRole
+	User.findById(userId,function(err, user){
+		if (err) {
+			res.status(500).send(err);
+			return;
+		} else if (!user) {
+			res.status(404).send(err);
+			return;
+		}
 
-// 	}, function(err, data){
+		
+			var index = user.role.indexOf(role);
+				if(user.role.indexOf(role)!=-1){
+					user.role.splice(index,1);
+				
+			}
 
-// 		if(err){
-// 			res.status(500).send(err);
-// 			return;
-// 		}
+			user.save(function(err) {
+				if(err){
+					res.status(500).send(err);
+					return;
+				}
 
-// 		console.log('Deleted' + data.n + 'documents');
-// 		res.sendStatus(204);
-
-// 	});
-// });
-
-// router.delete('/:idUser/role', function (req, res, next){
-	
-// 	var userId = req.params.idUser;
-
-// 	var role = req.body.role;
-
-// 	User.findById(userId,function(err, user){
-// 		if (err) {
-// 			res.status(500).send(err);
-// 			return;
-// 		} else if (!user) {
-// 			res.status(404).send(err);
-// 			return;
-// 		}
-// 			//user.role.push(role);
-// 			for(var i=0;i<role.length;i++){
-// 				if(user.role.indexOf(role[i])==-1){
-// 					user.role.remove(role[i]);
-// 				}
-// 			}
-// 			user.save(function(err) {
-// 				if(err){
-// 					res.status(500).send(err);
-// 					return;
-// 				}
-
-// 				res.send(user);
-// 			});
-// 	});
-// });
+				res.sendStatus(204);
+			});
+	});
+});
 
 
 //Get /api/v1/users
@@ -192,33 +242,22 @@ router.get('/api/v1/', function(req, res, next){
 	});
 });
 
-//Get /api/v1/users
-//get the list of all users "staff"
-router.get('/', function(req, res, next){
-	User.find(function (err,user){
-		if (err){
-			res.status(500).send(err);
-			return;
-		}
-	res.send(user);
-	});
-});
 
 
 //Get /api/v1/users selon ID
 //get the list of the issues raised by a user
-router.get('/:idUser', function(req, res, next){
-	var idUser
-	 = req.params.idUser;
 
-	User.findById(idUser, function(err, user){
+router.get('/:idUser/issue', findUser, function(req, res, next){
+	var idUser = req.params.idUser;
+	var criteria = {"author":idUser};
+
+	Issue.find(criteria, function(err, issue){
 		if(err){
 			res.status(500).send(err);
 			return;
-		} else if (!user){
-			res.status(404).send('User not found');
-			return;
-		}
-		res.send(user);
+		} 
+		res.send(issue);
 	});
 });
+
+
