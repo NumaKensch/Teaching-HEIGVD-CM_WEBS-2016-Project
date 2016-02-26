@@ -8,6 +8,11 @@ var IssueSchema = new Schema({
 		type: { type:String, required:true }, 
 		coordinates: [{ type:Number, required:true }]
 	},
+	issueType: 
+		{
+			issueTypeId: { type: Schema.Types.ObjectId, ref: 'IssueType', required:true },
+			type: { type:String, required:true }
+		},
 	status: { type:String, required:true },
 	action: [
 		{
