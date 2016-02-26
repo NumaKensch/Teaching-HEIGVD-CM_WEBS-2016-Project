@@ -38,7 +38,7 @@ router.get('/', function(req, res, next){
 //get a user
 router.get('/:idUser', function(req, res, next){
 	var idUser
-	 = req.params.id;
+	 = req.params.idUser;
 
 	User.findById(idUser, function(err, user){
 		if(err){
@@ -58,7 +58,7 @@ router.get('/:idUser', function(req, res, next){
 router.delete('/:idUser', function(req, res, next){
 
 	var idUser
-	 = req.params.id;
+	 = req.params.idUser;
 
 	User.remove({
 		_id: idUser
@@ -89,41 +89,136 @@ router.delete('/:idUser', function(req, res, next){
 	});
 
 
-//POST /api/v1/users 
-//Add the role staff to a citizen
+//POST /api/v1/users/:id/role 
+//Add the role staff to a user
 
-router.post('/api/v1/users?:idUser?role=:idRole', function (req, res, next){
-	var user = new User(req.body);
+router.post('/:idUser/role', function (req, res, next){
+	
+	var userId = req.params.idUser;
 
-	user.save(function(err, addRole){
+	var role = req.body.role;
+
+	User.findById(userId,function(err, user){
 		if (err) {
 			res.status(500).send(err);
 			return;
+		} else if (!user) {
+			res.status(404).send(err);
+			return;
 		}
+			//user.role.push(role);
+			for(var i=0;i<role.length;i++){
+				if(user.role.indexOf(role[i])==-1){
+					user.role.push(role[i]);
+				}
+			}
+			user.save(function(err) {
+				if(err){
+					res.status(500).send(err);
+					return;
+				}
 
-		res.send(addRole);
+				res.send(user);
+			});
 	});
 });
 
+
 //DELETE /api/v1/users/:idUser
-//Delete the role staff to a citizen
-router.delete('/api/v1/users?:idUser?role=:idRole', function(req, res, next){
+//Delete the role staff to a use
 
-	var idRole
-	 = req.params.idRole;
+// router.delete('/api/v1/users', function(req, res, next){
 
-	User.role.remove({
-		_id: idRole
+// 	var idRole
+// 	 = req.params.idRole;
 
-	}, function(err, data){
+// 	User.role.remove({
+// 		_id: idRole
 
-		if(err){
+// 	}, function(err, data){
+
+// 		if(err){
+// 			res.status(500).send(err);
+// 			return;
+// 		}
+
+// 		console.log('Deleted' + data.n + 'documents');
+// 		res.sendStatus(204);
+
+// 	});
+// });
+
+// router.delete('/:idUser/role', function (req, res, next){
+	
+// 	var userId = req.params.idUser;
+
+// 	var role = req.body.role;
+
+// 	User.findById(userId,function(err, user){
+// 		if (err) {
+// 			res.status(500).send(err);
+// 			return;
+// 		} else if (!user) {
+// 			res.status(404).send(err);
+// 			return;
+// 		}
+// 			//user.role.push(role);
+// 			for(var i=0;i<role.length;i++){
+// 				if(user.role.indexOf(role[i])==-1){
+// 					user.role.remove(role[i]);
+// 				}
+// 			}
+// 			user.save(function(err) {
+// 				if(err){
+// 					res.status(500).send(err);
+// 					return;
+// 				}
+
+// 				res.send(user);
+// 			});
+// 	});
+// });
+
+
+//Get /api/v1/users
+//get the list of all users "citizen"
+router.get('/api/v1/', function(req, res, next){
+	User.find(role, function (err,user){
+		if (err){
 			res.status(500).send(err);
 			return;
 		}
+	res.send(user);
+	});
+});
 
-		console.log('Deleted' + data.n + 'documents');
-		res.sendStatus(204);
+//Get /api/v1/users
+//get the list of all users "staff"
+router.get('/', function(req, res, next){
+	User.find(function (err,user){
+		if (err){
+			res.status(500).send(err);
+			return;
+		}
+	res.send(user);
+	});
+});
 
+
+//Get /api/v1/users selon ID
+//get the list of the issues raised by a user
+router.get('/:idUser', function(req, res, next){
+	var idUser
+	 = req.params.idUser;
+
+	User.findById(idUser, function(err, user){
+		if(err){
+			res.status(500).send(err);
+			return;
+		} else if (!user){
+			res.status(404).send('User not found');
+			return;
+		}
+		res.send(user);
 	});
 });

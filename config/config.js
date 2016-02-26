@@ -26,6 +26,8 @@ var config = {
     app: {
       name: 'webserv'
     },
+    //port: process.env.PORT || 3000,
+    //db:process.env.MONGOLAB_URI || 'mongodb://localhost/webs-2016-example-production', heroku ne marche pas avec carte credit
     port: 3000,
     db: 'mongodb://localhost/webserv-production'
   }
