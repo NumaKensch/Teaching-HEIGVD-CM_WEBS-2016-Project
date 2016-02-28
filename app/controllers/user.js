@@ -112,7 +112,8 @@ router.get('/:idUser', function(req, res, next){
  *     {
  *       "error": "UserNotFound"
  *     }
- */router.delete('/:idUser', function(req, res, next){
+ */
+ router.delete('/:idUser', function(req, res, next){
 
 	var idUser
 	= req.params.idUser;
