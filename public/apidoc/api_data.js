@@ -1,5 +1,217 @@
 define({ "api": [
   {
+    "type": "post",
+    "url": "/issuesTypes",
+    "title": "Add a type of issue",
+    "name": "addIssueType",
+    "group": "IssueType",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "nameShort",
+            "description": "<p>nameShort of the IssueType.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>Description of the IssueType.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/issueType.js",
+    "groupTitle": "IssueType"
+  },
+  {
+    "type": "delete",
+    "url": "//:idIssueType",
+    "title": "Delete a issueType information",
+    "name": "deleteIssueType",
+    "group": "IssueType",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>IssueType unique ID.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "IssueTypeNotFound",
+            "description": "<p>The id of the IssueType was not found.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"IssueTypeNotFound\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/issueType.js",
+    "groupTitle": "IssueType"
+  },
+  {
+    "type": "get",
+    "url": "/issuesTypes/:idIssu",
+    "title": "Request a issueType information",
+    "name": "GetIssueType",
+    "group": "IssuesTypes",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Id of the IssueType.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "nameShort",
+            "description": "<p>nameShort of the IssueType.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>Description of the IssueType.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "version",
+            "description": "<p>Version of the IssueType.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n   \"_id\": \"56d01204fc5887801256e80e\",\n   \"nameShort\": \"cassé\",\n   \"description\": \"poteau\",\n   \"__v\": 0\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "IssueTypeNotFound",
+            "description": "<p>The id of the IssueType was not found.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"IssueTypeNotFound\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/issueType.js",
+    "groupTitle": "IssuesTypes"
+  },
+  {
+    "type": "get",
+    "url": "/issuesTypes",
+    "title": "Request issuesTypes information",
+    "name": "GetIssuesTypes",
+    "group": "IssuesTypes",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Id of the IssueType.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "nameShort",
+            "description": "<p>nameShort of the IssueType.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>Description of the IssueType.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "version",
+            "description": "<p>Version of the IssueType.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n   \"_id\": \"56d01204fc5887801256e80e\",\n   \"nameShort\": \"cassé\",\n   \"description\": \"poteau\",\n   \"__v\": 0\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "IssueTypeNotFound",
+            "description": "<p>The id of the IssueType was not found.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"IssueTypeNotFound\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "app/controllers/issueType.js",
+    "groupTitle": "IssuesTypes"
+  },
+  {
     "type": "get",
     "url": "/:idUser/issue",
     "title": "Get the list of the issues raised by a user",
@@ -81,77 +293,77 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "action",
-            "description": "<p>KeyWords of the Issue.</p>"
+            "description": "<p>action of the Issue.</p>"
           },
           {
             "group": "Success 200",
             "type": "Number",
             "optional": false,
             "field": "action.staffId",
-            "description": "<p>the word.</p>"
+            "description": "<p>Id of the action's staff.</p>"
           },
           {
             "group": "Success 200",
             "type": "Date",
             "optional": false,
             "field": "action.date",
-            "description": "<p>Id of the word.</p>"
+            "description": "<p>Date of the action.</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "action.description",
-            "description": "<p>Id of the word.</p>"
+            "description": "<p>Description of action.</p>"
           },
           {
             "group": "Success 200",
             "type": "Number",
             "optional": false,
             "field": "action.id",
-            "description": "<p>Id of the word.</p>"
+            "description": "<p>Id of the action.</p>"
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "issueType",
-            "description": "<p>KeyWords of the Issue.</p>"
+            "description": "<p>IssueType of the issue.</p>"
           },
           {
             "group": "Success 200",
             "type": "Number",
             "optional": false,
             "field": "issueType.issueTypeId",
-            "description": "<p>the word.</p>"
+            "description": "<p>Id of the issueType.</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "issueType.type",
-            "description": "<p>Id of the word.</p>"
+            "description": "<p>Type of the issue.</p>"
           },
           {
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "coordinate",
-            "description": "<p>KeyWords of the Issue.</p>"
+            "description": "<p>Coordinate of the Issue.</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "coordinate.type",
-            "description": "<p>the word.</p>"
+            "description": "<p>Type of the coordinate.</p>"
           },
           {
             "group": "Success 200",
             "type": "Number[]",
             "optional": false,
             "field": "coordinate.coordinates",
-            "description": "<p>Id of the word.</p>"
+            "description": "<p>Coordinates with longitude and latitude.</p>"
           }
         ]
       },
@@ -188,7 +400,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/users/:id",
+    "url": "/users",
     "title": "Request User information",
     "name": "GetUser",
     "group": "User",
@@ -334,6 +546,16 @@ define({ "api": [
         }
       ]
     },
+    "version": "0.0.0",
+    "filename": "app/controllers/user.js",
+    "groupTitle": "User"
+  },
+  {
+    "type": "get",
+    "url": "/users?page={integer}&pageSize={integer}",
+    "title": "Request User information per page and check size.",
+    "name": "GetUserPerPageAndSize",
+    "group": "User",
     "version": "0.0.0",
     "filename": "app/controllers/user.js",
     "groupTitle": "User"
