@@ -30,46 +30,29 @@ function findUser(req, res, next){
  * @apiName addUser
  * @apiGroup Users
  *
- * @apiParam {Number} id Users unique ID.
- *
  * @apiSuccess {String} firstname Firstname of the User.
  * @apiSuccess {String} lastname  Lastname of the User.
+ * 
+ * @apiSuccess {String[]} role  role of the User (star or citizen or both).
  *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
- *     {
- *       "firstname": "John",
- *       "lastname": "Doe"
- *     }
- *
- * @apiError UserNotFound The id of the User was not found.
- *
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 404 Not Found
- *     {
- *       "error": "UserNotFound"
- *     }
  */
-router.post('/', function (req, res, next){
-	var user = new User(req.body);
+ router.post('/', function (req, res, next){
+ 	var user = new User(req.body);
 
-	user.save(function(err, createdUser){
-		if (err) {
-			res.status(500).send(err);
-			return;
-		}
+ 	user.save(function(err, createdUser){
+ 		if (err) {
+ 			res.status(500).send(err);
+ 			return;
+ 		}
 
-		res.send(createdUser);
-	});
-});
+ 		res.send(createdUser);
+ 	});
+ });
 
 
-
-//Get /api/v1/users
-//get the list of all users
 
 /**
- * @api {get} /user/:id Request User information
+ * @api {get} /users/:id Request User information
  * @apiName GetUser
  * @apiGroup User
  *
@@ -78,11 +61,16 @@ router.post('/', function (req, res, next){
  * @apiSuccess {String} firstname Firstname of the User.
  * @apiSuccess {String} lastname  Lastname of the User.
  *
+ * @apiSuccess {String[]} role  role of the User (star or citizen or both).
+ *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
  *     {
- *       "firstname": "John",
- *       "lastname": "Doe"
+ *      "name": {
+ *        "first": "Jean",
+ *        "last": "Dupont"
+ *     },
+ *      "role":["citizen", "staff"]
  *     }
  *
  * @apiError UserNotFound The id of the User was not found.
@@ -93,12 +81,9 @@ router.post('/', function (req, res, next){
  *       "error": "UserNotFound"
  *     }
  */
-
-//Get /api/v1/users selon ID
-//get a user
 router.get('/:idUser', function(req, res, next){
 	var idUser
-	 = req.params.idUser;
+	= req.params.idUser;
 
 	User.findById(idUser, function(err, user){
 		if(err){
@@ -113,12 +98,24 @@ router.get('/:idUser', function(req, res, next){
 });
 
 
-//DELETE /api/v1/users/:id
-//Delete a user
-router.delete('/:idUser', function(req, res, next){
+/**
+ * @api {delete} /users/:id Delete User information
+ * @apiName deleteUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiError UserNotFound The id of the User was not found.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "UserNotFound"
+ *     }
+ */router.delete('/:idUser', function(req, res, next){
 
 	var idUser
-	 = req.params.idUser;
+	= req.params.idUser;
 
 	User.remove({
 		_id: idUser
@@ -136,22 +133,24 @@ router.delete('/:idUser', function(req, res, next){
 	});
 });
 
-//GET /api/v1/users/:id
-//get the list of all users with the pagination
-	router.get('/api/v1/users?page={integer}&per_page={integer}', function(req, res, next){
-		User.find(function (err,user){
-			if (err){
-				res.status(500).send(err);
-				return;
-			}
-		res.send(user);
-		});
-	});
 
-
-//POST /api/v1/users/:id/role 
-//Add the role staff to a user
-
+/**
+ * @api {post} /users/:idUser/role Add the role staff to a user
+ * @apiName addRoleStaff
+ * @apiGroup User
+ * 
+ * @apiSuccess {String[]} role  role of the User (star or citizen or both).
+ *
+ *
+ * @apiError UserNotFound The id of the User was not found.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "UserNotFound"
+ *     }
+ *
+ */
 router.post('/:idUser/role', function (req, res, next){
 	
 	var userId = req.params.idUser;
@@ -166,7 +165,6 @@ router.post('/:idUser/role', function (req, res, next){
 			res.status(404).send(err);
 			return;
 		}
-			//user.role.push(role);
 			for(var i=0;i<role.length;i++){
 				if(user.role.indexOf(role[i])==-1){
 					user.role.push(role[i]);
@@ -180,12 +178,29 @@ router.post('/:idUser/role', function (req, res, next){
 
 				res.send(user);
 			});
-	});
+		});
 });
 
 
 //DELETE /api/v1/users/:idUser/role
 //Delete the role staff to a use
+
+/**
+ * @api {delete} /users/:idUser/role Delete the role staff to a user
+ * @apiName deleteRoleStaff
+ * @apiGroup User
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiError UserNotFound The id of the User was not found.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "UserNotFound"
+ *     }
+ *
+ */
 
 router.delete('/:idUser/role/:role',findUser,function(req, res, next){
 	var userId = req.params.idUser;
@@ -202,27 +217,99 @@ router.delete('/:idUser/role/:role',findUser,function(req, res, next){
 		}
 
 		
-			var index = user.role.indexOf(role);
-				if(user.role.indexOf(role)!=-1){
-					user.role.splice(index,1);
-				
+		var index = user.role.indexOf(role);
+		if(user.role.indexOf(role)!=-1){
+			user.role.splice(index,1);
+
+		}
+
+		user.save(function(err) {
+			if(err){
+				res.status(500).send(err);
+				return;
 			}
 
-			user.save(function(err) {
-				if(err){
-					res.status(500).send(err);
-					return;
-				}
-
-				res.sendStatus(204);
-			});
+			res.sendStatus(204);
+		});
 	});
 });
 
 
 
-//Get /api/v1/users selon ID
-//get the list of the issues raised by a user
+/**
+ * @api {get} /:idUser/issue Get the list of the issues raised by a user
+ * @apiName GetIssuesRaisedByUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiSuccess {Number} id Issue unique ID.
+ * @apiSuccess {String} author Users unique ID.
+ * @apiSuccess {String} description Description of the Issue.
+ * @apiSuccess {String} status status of the Issue.
+ * @apiSuccess {Number} version version of the Issue.
+ *
+ * @apiSuccess [Object[]] keyWords       KeyWords of the Issue.
+ * @apiSuccess {String}   keyWords.word  the word.
+ * @apiSuccess {Number}   keyWords.id    Id of the word.
+ *
+ * @apiSuccess {Object[]} action             action of the Issue.
+ * @apiSuccess {Number}   action.staffId     Id of the action's staff.
+ * @apiSuccess {Date}     action.date        Date of the action.
+ * @apiSuccess {String}   action.description Description of action.
+ * @apiSuccess {Number}   action.id          Id of the action.
+ * 
+ * @apiSuccess {Object[]} issueType              IssueType of the issue.
+ * @apiSuccess {Number}   issueType.issueTypeId  Id of the issueType.
+ * @apiSuccess {String}   issueType.type         Type of the issue.
+ *
+ * @apiSuccess {Object[]} coordinate               Coordinate of the Issue.
+ * @apiSuccess {String}   coordinate.type          Type of the coordinate.
+ * @apiSuccess {Number[]} coordinate.coordinates   Coordinates with longitude and latitude.
+ *
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *   "_id": "56d024b7f3b5d46815091085",
+ *   "author": "56cf02994217783c3712280c",
+ *   "description": "boum",
+ *   "status": "boum",
+ *  "__v": 0,
+ *   "keyWords": [
+ *     {
+ *       "word": "boum",
+ *       "_id": "56d024b7f3b5d46815091086"
+ *     }
+ *   ],
+ *   "action": [
+ *     {
+ *       "staffId": "56cf02994217783c3712280c",
+ *       "date": "2015-12-02T00:00:00.000Z",
+ *       "description": "boum",
+ *       "_id": "56d024b7f3b5d46815091087"
+ *     }
+ *   ],
+ *   "issueType": {
+ *     "issueTypeId": "56d01204fc5887801256e80e",
+ *     "type": "boum"
+ *   },
+ *  "coordinate": {
+ *     "type": "boum",
+ *     "coordinates": [
+ *       1236
+ *     ]
+ *   }
+ * }
+ *
+ * @apiError UserNotFound The id of the User was not found.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "UserNotFound"
+ *     }
+ */
 
 router.get('/:idUser/issue', findUser, function(req, res, next){
 	var idUser = req.params.idUser;
@@ -241,7 +328,36 @@ router.get('/:idUser/issue', findUser, function(req, res, next){
 
 
 
-//Get /api/issues
+/**
+ * @api {get} /users Request User information
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiSuccess {String} firstname Firstname of the User.
+ * @apiSuccess {String} lastname  Lastname of the User.
+ *
+ * @apiSuccess {String[]} role  role of the User (star or citizen or both).
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *      "name": {
+ *        "first": "Jean",
+ *        "last": "Dupont"
+ *     },
+ *      "role":["citizen", "staff"]
+ *     }
+ *
+ * @apiError UserNotFound The id of the User was not found.
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "UserNotFound"
+ *     }
+ */
 router.get('/', function(req, res, next){
 	var criteria = {};
 
@@ -259,22 +375,31 @@ router.get('/', function(req, res, next){
 		criteria.role ={$in:[req.query.role]};
 	}
 
-	// Get page and page size for pagination.
-	var page = req.query.page ? parseInt(req.query.page, 10) : 1,
-	pageSize = req.query.pageSize ? parseInt(req.query.pageSize, 10) : 30;
 
-	// Convert page and page size to offset and limit.
-	var offset = (page - 1) * pageSize,
-	limit = pageSize;
+/**
+ * @api {get} /users?page={integer}&pageSize={integer} Request User information per page and check size.
+ * @apiName GetUserPerPageAndSize
+ * @apiGroup User
+ *
+ */
+ // Get page and page size for pagination.
+ 	var page = req.query.page ? parseInt(req.query.page, 10) : 1,
+ 	pageSize = req.query.pageSize ? parseInt(req.query.pageSize, 10) : 30;
+ 
+ 
 
-	// Count all users (without filters).
-	function countAllUsers(callback) {
+ // Convert page and page size to offset and limit.
+ 	var offset = (page - 1) * pageSize,
+ 	limit = pageSize;
+ 
+  	// Count all users (without filters).
+	 function countAllUsers(callback) {
 		User.count(function(err, totalCount) {
-	  		if (err) {
-	    		callback(err);
-	  		} else {
-	    		callback(undefined, totalCount);
-	  		}
+			if (err) {
+				callback(err);
+			} else {
+				callback(undefined, totalCount);
+			}
 		});
 	}
 
@@ -282,20 +407,20 @@ router.get('/', function(req, res, next){
 
   	// Count books matching the filters.
   	function countFilteredUsers(callback) {
-    	User.count(criteria, function(err, filteredCount) {
-      	if (err) {
-        		callback(err);
-      		} else {
-        		callback(undefined, filteredCount);
-      		}
-    	});
+  		User.count(criteria, function(err, filteredCount) {
+  			if (err) {
+  				callback(err);
+  			} else {
+  				callback(undefined, filteredCount);
+  			}
+  		});
   	}
 
   	// Find books matching the filters.
   	function findMatchingUsers(callback) {
 
-    	var query = User
-      	.find(criteria)
+  		var query = User
+  		.find(criteria)
 
       	// Do not forget to sort, as pagination makes more sense with sorting.
       	.sort('name.first')
@@ -304,54 +429,54 @@ router.get('/', function(req, res, next){
 
     	// Embed publisher object if specified in the query.
     	if (req.query.embed == 'publisher') {
-      		query = query.populate('publisher');
+    		query = query.populate('publisher');
     	}
 
     	// Execute the query.
     	query.exec(function(err, users) {
-      		if (err) {
-        		callback(err);
-      		} else {
-        		callback(undefined, users);
-      		}
+    		if (err) {
+    			callback(err);
+    		} else {
+    			callback(undefined, users);
+    		}
     	});
-  	}
+    }
 
-  	function findUsersByIssuesStatus(callback){
-  		var issues;
+    function findUsersByIssuesStatus(callback){
+    	var issues;
 
-  		Issue.find(function(err, issuesTmp) {
-	  		if (err) {
-	    		callback(err);
-	  		} else {
-	    		issues=issuesTmp;
-	  		}
-		});
+    	Issue.find(function(err, issuesTmp) {
+    		if (err) {
+    			callback(err);
+    		} else {
+    			issues=issuesTmp;
+    		}
+    	});
 
     	// Embed publisher object if specified in the query.
     	if (req.query.embed == 'publisher') {
-      		query = query.populate('publisher');
+    		query = query.populate('publisher');
     	}
 
     	// Execute the query.
     	query.exec(function(err, users) {
-      		if (err) {
-        		callback(err);
-      		} else {
-        		callback(undefined, users);
-      		}
+    		if (err) {
+    			callback(err);
+    		} else {
+    			callback(undefined, users);
+    		}
     	});
-  	}
+    }
   	// Set the pagination headers and send the matching books in the body.
   	function sendResponse(err, results) {
-    	if (err) {
-      		res.status(500).send(err);
-      		return;
-    	}
+  		if (err) {
+  			res.status(500).send(err);
+  			return;
+  		}
 
-    	var totalCount = results[0],
-        filteredCount = results[1],
-        users = results[2];
+  		var totalCount = results[0],
+  		filteredCount = results[1],
+  		users = results[2];
 
     	// Return the pagination data in headers.
     	res.set('X-Pagination-Page', page);
@@ -360,11 +485,11 @@ router.get('/', function(req, res, next){
     	res.set('X-Pagination-Filtered-Total', filteredCount);
 
     	res.send(users);
-  	}
+    }
 
-	async.parallel([
-    countAllUsers,
-    countFilteredUsers,
-    findMatchingUsers
-  	], sendResponse);
+    async.parallel([
+    	countAllUsers,
+    	countFilteredUsers,
+    	findMatchingUsers
+    	], sendResponse);
 });
