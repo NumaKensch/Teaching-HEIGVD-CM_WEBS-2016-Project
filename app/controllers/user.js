@@ -224,17 +224,16 @@ router.delete('/:idUser/role/:role',findUser,function(req, res, next){
 //Get /api/v1/users selon ID
 //get the list of the issues raised by a user
 
-router.get('/:idUser/issue', findUser, function(req, res, next){
+router.get('/:idUser/issues', findUser, function(req, res, next){
 	var idUser = req.params.idUser;
 	var criteria = {"author":idUser};
 
-
-	Issue.find(criteria, function(err, issue){
+	Issue.find(criteria, function(err, issues){
 		if(err){
 			res.status(500).send(err);
 			return;
 		} 
-		res.send(issue);
+		res.send(issues);
 	});
 });
 

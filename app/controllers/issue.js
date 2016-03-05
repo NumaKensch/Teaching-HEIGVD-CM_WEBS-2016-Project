@@ -11,7 +11,6 @@ module.exports = function (app) {
 };
 
 function findIssue(req, res, next){
-	console.log(req.params.id);
 	Issue.findById(req.params.id, function(err, issue){
 		if(err){
 			res.status(500).send(err);
@@ -75,7 +74,6 @@ router.get('/', function(req, res, next){
 		criteria.status = req.query.status;
 	}
 
- console.log(criteria);
 	// Get page and page size for pagination.
 	var page = req.query.page ? parseInt(req.query.page, 10) : 1,
 	pageSize = req.query.pageSize ? parseInt(req.query.pageSize, 10) : 30;
