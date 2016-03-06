@@ -4,6 +4,8 @@ Schema = mongoose.Schema;
 var IssueSchema = new Schema({
 	author: { type: Schema.Types.ObjectId, ref: 'User', required:true },
 	description: { type:String, required:true },
+	place : { type:String, required:true },
+	picture : { type:String, required:true },
 	coordinate: {
 		type: { type:String, required:true }, 
 		coordinates: [{ type:Number, required:true }]
@@ -27,6 +29,10 @@ var IssueSchema = new Schema({
 			word: { type:String, required:false}
 		} 
 	]
+});
+
+IssueSchema.index({
+	location: '2dsphere'
 });
 
 mongoose.model('Issue', IssueSchema);

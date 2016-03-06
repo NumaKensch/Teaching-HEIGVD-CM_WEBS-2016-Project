@@ -361,18 +361,16 @@ router.get('/:idUser/issues', findUser, function(req, res, next){
 router.get('/', function(req, res, next){
 	var criteria = {};
 
-	console.log("bou");
-
-	if (req.query.limit) {
-		var limitUser = req.query.limit;
-	}
-
 	if (req.query.status) {
 		criteria.status = req.query.status;
 	}
 
 	if (req.query.role) {
 		criteria.role ={$in:[req.query.role]};
+	}
+
+	if (req.query.order) {
+		criteria.order = req.query.order;
 	}
 
 
@@ -405,68 +403,144 @@ router.get('/', function(req, res, next){
 
 
 
-  	// Count books matching the filters.
   	function countFilteredUsers(callback) {
-  		User.count(criteria, function(err, filteredCount) {
-  			if (err) {
-  				callback(err);
-  			} else {
-  				callback(undefined, filteredCount);
-  			}
-  		});
+	  	if (criteria !== ""){
+	  		Issue.find( { status: criteria.status },function(err, issues){
+
+				if(err){
+					res.status(500).send(err);
+					return;
+				}
+
+				var users = [];
+				var filteredCount = 0;
+				var userExist = false;
+		  		if (criteria.status == "created") {
+		  			for (var i = 0; i < issues.length; i++ ) {
+		  				for (var j = 0; j < users.length; j++ ) {
+		  					if (issues[i].author == String(users[j])) {
+		  						userExist = true;
+		  					}
+		  				}
+		  				if (userExist === false) {
+		  					users.push(issues[i].author);
+		  					filteredCount += 1;
+		  				} else {
+		  					userExist = false;
+	  					}
+		  			}
+		  		} else {
+					for (var x = 0; x < issues.length; x++ ) {
+		  				for (var y = 0; y < users.length; y++ ) {
+		  					if (issues[x].action[1].staffId == String(users[y])) {
+		  						userExist = true;
+		  					}
+		  				}
+		  				if (userExist === false) {
+		  					users.push(issues[x].action[1].staffId);
+		  					filteredCount += 1;
+		  				} else {
+		  					userExist = false;
+	  					}
+		  			}		  			
+		  		}
+		  		console.log(parseInt(filteredCount));
+		  		filteredCount = parseInt(filteredCount);
+		  		callback(undefined, filteredCount);
+			});	
+	  	} else {  
+	  		User.count(function(err, filteredCount) {
+	  			if (err) {
+	  				callback(err);
+	  			} else {
+	  				callback(undefined, filteredCount);
+	  			}
+	  		});
+	  	}
   	}
 
-  	// Find books matching the filters.
+
   	function findMatchingUsers(callback) {
+  		if (req.query.status) {
+			Issue.find( { status: criteria.status })
+				.populate("author action.staffId")
+				.exec(function(err, issues){
+					if(err){
+						res.status(500).send(err);
+						return;
+					}
+					var users = [];
+					var userExist = false;
+			  		if (criteria.status == "created") {
+			  			for (var i = 0; i < issues.length; i++ ) {
+			  				for (var j = 0; j < users.length; j++ ) {
+			  					if (issues[i].author == String(users[j].id)) {
+			  						userExist = true;
+			  						users[j].numberIssues = users[j].numberIssues + 1;
+			  					}
+			  				}
+			  				if (userExist === false) {
+			  					users.push({ id : issues[i].author, numberIssues : 1});
+			  				} else {
+			  					userExist = false;
+							}
+			  			}
+			  		} else {
+						for (var x = 0; x < issues.length; x++ ) {
+			  				for (var y = 0; y < users.length; y++ ) {
+			  					if (issues[x].action[1].staffId == String(users[y])) {
+			  						userExist = true;
+			  						users[y].numberIssues = users[y].numberIssues + 1;
+			  					}
+			  				}
+			  				if (userExist === false) {
+			  					users.push({ id : issues[x].action[1].staffId , numberIssues : 1});
+			  				} else {
+			  					userExist = false;
+								}
+			  			}		  			
+			  		}
 
-  		var query = User
-  		.find(criteria)
+			  		if (criteria.order == "desc") {
+		  				users.sort(function (a, b) {
+			  				if (a.numberIssues > b.numberIssues) return 1;
+			  				if (a.numberIssues < b.numberIssues) return -1;
+			  				return 0;
+			  			});
+		  			} else {
+			  			users.sort(function (a, b) {
+			  				if (a.numberIssues < b.numberIssues) return 1;
+			  				if (a.numberIssues > b.numberIssues) return -1;
+			  				return 0;
+			  			});
+			  		}
+			  		callback(undefined, users);
+			});	
+		} else {
+	  		var query = User
+	  		.find(criteria)
 
-      	// Do not forget to sort, as pagination makes more sense with sorting.
-      	.sort('name.first')
-      	.skip(offset)
-      	.limit(limit);
+	      	// Do not forget to sort, as pagination makes more sense with sorting.
+	      	.sort('name.first')
+	      	.skip(offset)
+	      	.limit(limit);
 
-    	// Embed publisher object if specified in the query.
-    	if (req.query.embed == 'publisher') {
-    		query = query.populate('publisher');
-    	}
+	    	// Embed publisher object if specified in the query.
+	    	if (req.query.embed == 'publisher') {
+	    		query = query.populate('publisher');
+	    	}
 
-    	// Execute the query.
-    	query.exec(function(err, users) {
-    		if (err) {
-    			callback(err);
-    		} else {
-    			callback(undefined, users);
-    		}
-    	});
+	    	// Execute the query.
+	    	query.exec(function(err, users) {
+	    		if (err) {
+	    			callback(err);
+	    		} else {
+	    			callback(undefined, users);
+	    		}
+	    	});
+	    }
     }
 
-    function findUsersByIssuesStatus(callback){
-    	var issues;
-
-    	Issue.find(function(err, issuesTmp) {
-    		if (err) {
-    			callback(err);
-    		} else {
-    			issues=issuesTmp;
-    		}
-    	});
-
-    	// Embed publisher object if specified in the query.
-    	if (req.query.embed == 'publisher') {
-    		query = query.populate('publisher');
-    	}
-
-    	// Execute the query.
-    	query.exec(function(err, users) {
-    		if (err) {
-    			callback(err);
-    		} else {
-    			callback(undefined, users);
-    		}
-    	});
-    }
   	// Set the pagination headers and send the matching books in the body.
   	function sendResponse(err, results) {
   		if (err) {

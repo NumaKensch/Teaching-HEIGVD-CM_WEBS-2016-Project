@@ -5,6 +5,7 @@ mongoose = require('mongoose'),
 Issue =mongoose.model('Issue');
 User =mongoose.model('User');
 Comment =mongoose.model('Comment');
+Comment =mongoose.model('IssueType');
 
 module.exports = function (app) {
 	app.use('/api/v1/issues', router);
@@ -44,7 +45,22 @@ function findUserGenerator(attribute) {
 //Post /api/issues
 router.post('/', function (req, res, next){
 	var issue = new Issue(req.body);
+	issue.status = "created";
 
+	/*
+	IssueType.findById(issue.issueType.issueTypeId, function(err, issueType){
+		if(err){
+			res.status(500).send(err);
+			return;
+		}else if (!issueType) {
+			res.status(404).send('IssueType not found');
+			return;
+		}else if (issueType.nameShort != issue.issueType.type) {
+			res.send("Issue type doesn't match with IssueType related");
+			return;
+		}
+	});
+	*/
 	issue.save(function(err, createdIssue){
 		if (err) {
 			res.status(500).send(err);
@@ -58,12 +74,27 @@ router.post('/', function (req, res, next){
 router.get('/', function(req, res, next){
 	var criteria = {};
 
+	var latitude = req.query.latitude,
+      	longitude = req.query.longitude,
+      	distance = req.query.distance;
+
 	if (req.query.issuesType) {
 		criteria["issueType.type"] = req.query.issuesType;
 	}
-
-	if (req.query.region) {
-		criteria.region = req.query.region;
+	
+	if (latitude && longitude && distance) {
+		criteria.location = {
+	  		$near: {
+	    		$geometry: {
+	      		type: 'Point',
+	      		coordinates: [
+	        		parseFloat(longitude),
+	        		parseFloat(latitude)
+	      		]
+	    },
+	    $maxDistance: parseInt(distance, 10)
+	  }
+	};
 	}
 
 	if (req.query.startDate) {
@@ -109,7 +140,6 @@ router.get('/', function(req, res, next){
 
     	var query = Issue
       	.find(criteria)
-      	// Do not forget to sort, as pagination makes more sense with sorting.
       	.sort('date')
       	.skip(offset)
       	.limit(limit);
@@ -201,6 +231,9 @@ router.delete('/:id', findIssue,function(req, res, next){
 //*************************
 router.post('/:id/action', findIssue, findUserGenerator("staffId"), function(req, res, next) {
 		var action = req.body;
+		
+		if (req.issue.status == "solved" || req.issue.status == "rejected") return res.send("No actions possible");
+		if (req.issue.status != "created" && req.issue.action.author != action.author) return res.send("Issue allready assigned");
 
 		req.issue.action.push(action);
 		req.issue.save(function(err) {
@@ -208,8 +241,35 @@ router.post('/:id/action', findIssue, findUserGenerator("staffId"), function(req
 				res.status(500).send(err);
 				return;
 			}
+			switch(req.issue.status) {
+			    case "created":
+			        Issue.findByIdAndUpdate (req.issue._id, {$set: {status: "acknowledged"}}, function (err, issue) {
+			        	if (err) return res.status(500).send(err);
+  						res.send(issue);
+			        });
+			        break;
+			    case "acknowledged":
+			        Issue.findByIdAndUpdate (req.issue._id, {$set: {status: "assigned"}}, function (err, issue) {
+			        	if (err) return res.status(500).send(err);
+  						res.send(issue);
+			        });
+			        break;
+			    case "assigned":
+			        Issue.findByIdAndUpdate (req.issue._id, {$set: {status: "in_progress"}}, function (err, issue) {
+			        	if (err) return res.status(500).send(err);
+  						res.send(issue);
+			        });
+			        break;
+			    case "in_progress":
+			        Issue.findByIdAndUpdate (req.issue._id, {$set: {status: "solved"}}, function (err, issue) {
+			        	if (err) return res.status(500).send(err);
+  						res.send(issue);
+			        });
+			        break;
+			    default:
+			    	res.status(404).send("Issue status not found");
+			}
 
-			res.send(action);
 		});
 });
 
@@ -253,8 +313,6 @@ router.delete('/:id/Comment/:idComment', findIssue, function(req, res, next){
 				res.status(500).send(err);
 				return;
 			}
-
-			console.log('Deleted' + data.n + 'documents');
 			res.sendStatus(204);
 
 		});
