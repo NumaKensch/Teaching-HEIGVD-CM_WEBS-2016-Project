@@ -5,7 +5,7 @@ mongoose = require('mongoose'),
 Issue =mongoose.model('Issue');
 User =mongoose.model('User');
 Comment =mongoose.model('Comment');
-Comment =mongoose.model('IssueType');
+IssueType =mongoose.model('IssueType');
 
 module.exports = function (app) {
 	app.use('/api/v1/issues', router);
@@ -47,7 +47,6 @@ router.post('/', function (req, res, next){
 	var issue = new Issue(req.body);
 	issue.status = "created";
 
-	/*
 	IssueType.findById(issue.issueType.issueTypeId, function(err, issueType){
 		if(err){
 			res.status(500).send(err);
@@ -56,17 +55,17 @@ router.post('/', function (req, res, next){
 			res.status(404).send('IssueType not found');
 			return;
 		}else if (issueType.nameShort != issue.issueType.type) {
-			res.send("Issue type doesn't match with IssueType related");
+			res.status(404).send("Issue type doesn't match with IssueType related");
 			return;
+		}else {
+			issue.save(function(err, createdIssue){
+				if (err) {
+					res.status(500).send(err);
+					return;
+				}
+				res.send(createdIssue);
+			});
 		}
-	});
-	*/
-	issue.save(function(err, createdIssue){
-		if (err) {
-			res.status(500).send(err);
-			return;
-		}
-		res.send(createdIssue);
 	});
 });
 
