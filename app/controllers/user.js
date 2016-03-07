@@ -265,9 +265,9 @@ router.delete('/:idUser/role/:role',findUser,function(req, res, next){
  * @apiSuccess {Number}   issueType.issueTypeId  Id of the issueType.
  * @apiSuccess {String}   issueType.type         Type of the issue.
  *
- * @apiSuccess {Object[]} coordinate               Coordinate of the Issue.
- * @apiSuccess {String}   coordinate.type          Type of the coordinate.
- * @apiSuccess {Number[]} coordinate.coordinates   Coordinates with longitude and latitude.
+ * @apiSuccess {Object[]} location               Coordinate of the Issue.
+ * @apiSuccess {String}   location.type          Type of the coordinate.
+ * @apiSuccess {Number[]} location.coordinates   Coordinates with longitude and latitude.
  *
  *
  * @apiSuccessExample Success-Response:

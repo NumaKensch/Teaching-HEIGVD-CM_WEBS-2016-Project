@@ -68,9 +68,9 @@ function findUserGenerator(attribute) {
  * @apiSuccess {Number}   issueType.issueTypeId  Id of the issueType.
  * @apiSuccess {String}   issueType.type         Type of the issue.
  *
- * @apiSuccess {Object[]} coordinate               Coordinate of the Issue.
- * @apiSuccess {String}   coordinate.type          Type of the coordinate.
- * @apiSuccess {Number[]} coordinate.coordinates   Coordinates with longitude and latitude.
+ * @apiSuccess {Object[]} location               Coordinate of the Issue.
+ * @apiSuccess {String}   location.type          Type of the coordinate.
+ * @apiSuccess {Number[]} location.coordinates   Coordinates with longitude and latitude.
  * 
  */
 
@@ -127,9 +127,9 @@ router.post('/', function (req, res, next){
  * @apiSuccess {Number}   issueType.issueTypeId  Id of the issueType.
  * @apiSuccess {String}   issueType.type         Type of the issue.
  *
- * @apiSuccess {Object[]} coordinate               Coordinate of the Issue.
- * @apiSuccess {String}   coordinate.type          Type of the coordinate.
- * @apiSuccess {Number[]} coordinate.coordinates   Coordinates with longitude and latitude.
+ * @apiSuccess {Object[]} location               Coordinate of the Issue.
+ * @apiSuccess {String}   location.type          Type of the coordinate.
+ * @apiSuccess {Number[]} location.coordinates   Coordinates with longitude and latitude.
  * 
  * @apiSuccessExample Success-Response:
  *     	HTTP/1.1 200 OK
@@ -330,9 +330,9 @@ router.get('/', function(req, res, next){
  * @apiSuccess {Number}   issueType.issueTypeId  Id of the issueType.
  * @apiSuccess {String}   issueType.type         Type of the issue.
  *
- * @apiSuccess {Object[]} coordinate               Coordinate of the Issue.
- * @apiSuccess {String}   coordinate.type          Type of the coordinate.
- * @apiSuccess {Number[]} coordinate.coordinates   Coordinates with longitude and latitude.
+ * @apiSuccess {Object[]} location               Coordinate of the Issue.
+ * @apiSuccess {String}   location.type          Type of the coordinate.
+ * @apiSuccess {Number[]} location.coordinates   Coordinates with longitude and latitude.
  * 
  * @apiSuccessExample Success-Response:
  *     	HTTP/1.1 200 OK
