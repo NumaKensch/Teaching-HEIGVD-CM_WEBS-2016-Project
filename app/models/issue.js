@@ -6,7 +6,7 @@ var IssueSchema = new Schema({
 	description: { type:String, required:true },
 	place : { type:String, required:true },
 	picture : { type:String, required:true },
-	coordinate: {
+	location: {
 		type: { type:String, required:true }, 
 		coordinates: [{ type:Number, required:true }]
 	},

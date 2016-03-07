@@ -162,7 +162,6 @@ router.get('/', function(req, res, next){
 	var latitude = req.query.lat,
       	longitude = req.query.lon,
       	distance = req.query.dist;
-
 /**
  * @api {get} /issues?issueType={string} List of issues of an issue's type defined.
  * @apiName GetIssuesBetweenDate
@@ -187,11 +186,11 @@ router.get('/', function(req, res, next){
 	      		coordinates: [
 	        		parseFloat(longitude),
 	        		parseFloat(latitude)
-	      		]
-	    },
-	    $maxDistance: parseInt(distance, 10)
-	  }
-	};
+	      			]
+	    		},
+	    		$maxDistance: parseInt(distance, 10)
+	  		}
+		};
 	}
 
 /**
