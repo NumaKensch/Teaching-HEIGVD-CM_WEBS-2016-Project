@@ -249,6 +249,8 @@ router.delete('/:idUser/role/:role',findUser,function(req, res, next){
  * @apiSuccess {String} description Description of the Issue.
  * @apiSuccess {String} status status of the Issue.
  * @apiSuccess {Number} version version of the Issue.
+ * @apiSuccess {String} place  Place of the issue.
+ * @apiSuccess {String} picture  Name of the picture of the issue.
  *
  * @apiSuccess [Object[]] keyWords       KeyWords of the Issue.
  * @apiSuccess {String}   keyWords.word  the word.
@@ -257,7 +259,6 @@ router.delete('/:idUser/role/:role',findUser,function(req, res, next){
  * @apiSuccess {Object[]} action             action of the Issue.
  * @apiSuccess {Number}   action.staffId     Id of the action's staff.
  * @apiSuccess {Date}     action.date        Date of the action.
- * @apiSuccess {String}   action.description Description of action.
  * @apiSuccess {Number}   action.id          Id of the action.
  * 
  * @apiSuccess {Object[]} issueType              IssueType of the issue.
@@ -361,17 +362,30 @@ router.get('/:idUser/issues', findUser, function(req, res, next){
 router.get('/', function(req, res, next){
 	var criteria = {};
 
+/**
+ * @api {get} /users?status={string}&order={string} Get users who had issues with this status and the number of he did. By default the order is descendant. Use the parameter order to do an ascendant order. Order parameter only works with status parameter 
+ * @apiName GetUsersByRole
+ * @apiGroup User
+ *
+ */	
 	if (req.query.status) {
 		criteria.status = req.query.status;
 	}
+	if (req.query.order) {
+		criteria.order = req.query.order;
+	}
 
+/**
+ * @api {get} /users?role={string} Listing users with the role declaring.
+ * @apiName GetUsersByRole
+ * @apiGroup User
+ *
+ */
 	if (req.query.role) {
 		criteria.role ={$in:[req.query.role]};
 	}
 
-	if (req.query.order) {
-		criteria.order = req.query.order;
-	}
+
 
 
 /**
